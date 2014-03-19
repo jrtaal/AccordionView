@@ -24,6 +24,37 @@
 @synthesize selectedIndex, isHorizontal, animationDuration, animationCurve;
 @synthesize allowsMultipleSelection, selectionIndexes, delegate, startsClosed, allowsEmptySelection;
 
+#pragma mark UIView methods
+
+-(void)initSetup {
+    
+    views = [NSMutableArray new];
+    headers = [NSMutableArray new];
+    originalSizes = [NSMutableArray new];
+    
+    self.backgroundColor = [UIColor clearColor];
+    
+   
+    self.userInteractionEnabled = YES;
+    
+    animationDuration = 0.3;
+    animationCurve = UIViewAnimationCurveEaseIn;
+    
+    self.autoresizesSubviews = NO;
+    
+    self.allowsMultipleSelection = NO;
+}
+
+-(id)initWithCoder:(NSCoder *)aDecoder {
+    self = [super initWithCoder:aDecoder];
+    if (self) {
+        [self initSetup];
+    }
+    return self;
+}
+
+
+
 - (id)initWithFrame:(CGRect)frame {
     self = [super initWithFrame:frame];
     if (self) {
@@ -82,8 +113,8 @@
             [aView setFrame:frame];
         }
         
-        [scrollView addSubview:aView];
-        [scrollView addSubview:aHeader];
+        [self addSubview:aView];
+        [self addSubview:aHeader];
         
         if ([aHeader respondsToSelector:@selector(addTarget:action:forControlEvents:)]) {
             [aHeader setTag:[headers count] - 1];
@@ -138,12 +169,15 @@
         
         [cleanIndexes addIndex:idx];
     }];
-
+    if ([delegate respondsToSelector:@selector(accordion:willChangeFromSelection:toSelection:)]) {
+        [delegate accordion:self willChangeFromSelection:selectionIndexes toSelection:cleanIndexes];
+    }
+    NSIndexSet * oldIndexes = selectionIndexes;
     selectionIndexes = cleanIndexes;
     [self setNeedsLayout];
     
-    if ([delegate respondsToSelector:@selector(accordion:didChangeSelection:)]) {
-        [delegate accordion:self didChangeSelection:self.selectionIndexes];
+    if ([delegate respondsToSelector:@selector(accordion:didChangeFromSelection:toSelection:)]) {
+        [delegate accordion:self didChangeFromSelection:oldIndexes toSelection: self.selectionIndexes ];
     }
 }
 
@@ -155,6 +189,8 @@
     return [selectionIndexes firstIndex];
 }
 
+
+#pragma mark Display
 - (void)setOriginalSize:(CGSize)size forIndex:(NSUInteger)index {
     if (index >= [views count]) return;
     
@@ -290,5 +326,6 @@
         i++;
     }
 }
+
 
 @end

@@ -22,7 +22,8 @@
 @class AccordionView;
 @protocol AccordionViewDelegate <NSObject>
 @optional
-- (void)accordion:(AccordionView *)accordion didChangeSelection:(NSIndexSet *)selection;
+- (void)accordion:(AccordionView *)accordion willChangeFromSelection:(NSIndexSet *)fromSelection toSelection:(NSIndexSet*) toSelection;
+- (void)accordion:(AccordionView *)accordion didChangeFromSelection:(NSIndexSet *)fromSelection toSelection:(NSIndexSet*) toSelection;
 @end
 
 @interface AccordionView : UIView <UIScrollViewDelegate> {
@@ -47,5 +48,6 @@
 @property (nonatomic, strong) id <AccordionViewDelegate> delegate;
 @property (nonatomic, assign) BOOL startsClosed;
 @property (nonatomic, assign) BOOL allowsEmptySelection;
+
 
 @end
